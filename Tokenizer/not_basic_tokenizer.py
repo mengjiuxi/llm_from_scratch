@@ -66,7 +66,7 @@ class RegexTokenizer(Tokenizer):
             self.merges[pair] = idx
             self.vocab[idx] = self.vocab[pair[0]] + self.vocab[pair[1]]
 
-    def _encode_bytes(self, text_bytes):
+    def _encode_chunk(self, text_bytes):
         """
         helper function to encode each chunk
         bytes are from text.encode("utf-8")
@@ -88,7 +88,7 @@ class RegexTokenizer(Tokenizer):
         text_chunks = re.findall(self.compiled_pattern, text)
         ids = []
         for chunk in text_chunks:
-            chunk_ids = self._encode_bytes(chunk.encode("utf-8"))
+            chunk_ids = self._encode_chunk(chunk.encode("utf-8"))
             ids.extend(chunk_ids)
         return ids
     

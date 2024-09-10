@@ -1,24 +1,10 @@
+notes for  _education_tiktoken.py
 
-# mergeable_ranks {} : token_bytes, token
-
-# How does tiktoken merge ?
-
-# [12, 42, 52, 516, 62, 23, 63, 22]
-
-# find the the minimum rank first, mark its position
-# concatenate the pair 
-# [12, [42, 52], 516, 62, 23, 63, 22]
-
-# do it again
-
-# [12, [[42, 52], 516], 62, 23, 63, 22]
-# it is possible for the part list to look like this before replacing with another token
-# so token_bytes can contain one to multiple bytes, and that corresponds to one new token
-
+Too lazy to format.
 
 self._decoder = {token: token_bytes for token_bytes, token in mergeable_ranks.items()}
 
-# summary on tiktoken _ducational.py and comparison with RegexTokenizer
+### summary on tiktoken _ducational.py and comparison with RegexTokenizer
 1. self._decoder reverse the mergeable_ranks
 2. encode calls bpe_encode() and returns a list of tokens
 3. bpe_encode(mergeable_ranks, input)
@@ -39,7 +25,7 @@ finally replace encoded individual element with their rank and return the encode
 inside bpe_train()
 words are first transformed to list of list of bytes
 
-### what does ranks look like?
+**what does ranks look like?**
 
 ranks is initalised with 0-255 bytes, each bytes corresponds to a rank 0 - 255
 for each most_frequent_pair, we add ranks[pair[0] + pair[1]] = token to the ranks

@@ -1,1 +1,1 @@
-Try to build LLM from scrach from Andrej Karpathy's videos.
+Try to build LLM from scrach with Andrej Karpathy's videos.

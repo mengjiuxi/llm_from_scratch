@@ -1,7 +1,6 @@
 import tiktoken
 from not_basic_tokenizer import RegexTokenizer
 
-
 GPT4_SPLIT_PATTERN = r"""'(?i:[sdmt]|ll|ve|re)|[^\r\n\p{L}\p{N}]?+\p{L}+|\p{N}{1,3}| ?[^\s\p{L}\p{N}]++[\r\n]*|\s*[\r\n]|\s+(?!\S)|\s+"""
 GPT4_SPECIAL_TOKENS = {
     '<|endoftext|>': 100257,
@@ -41,6 +40,7 @@ def bpe(mergeable_ranks, token, max_rank):
 def recover_merges(mergeable_ranks):
     """
     convert GPT_style mergeable_ranks to merges
+    honestly, I think mergeable ranks is cleaner
     """
     merges = {}
     for token, rank in mergeable_ranks.items():
@@ -56,7 +56,7 @@ def recover_merges(mergeable_ranks):
 
 class GPT4Tokenizer(RegexTokenizer):
     def __init__(self):
-        super().__init__(pattern=GPT4_SPECIAL_TOKENS)
+        super().__init__(pattern=GPT4_SPLIT_PATTERN)
         enc = tiktoken.get_encoding("cl100k_base")
         mergeable_ranks = enc._mergeable_ranks
         self.merges = recover_merges(mergeable_ranks)
@@ -70,14 +70,14 @@ class GPT4Tokenizer(RegexTokenizer):
         self.inverse_byte_shuffle = {v: k for k, v in self.byte_shuffle.items()}
         
     def _encode_chunk(self, text_bytes):
-        test_bytes = bytes(self.byte_shuffle[b] for b in text_bytes)
+        text_bytes = bytes(self.byte_shuffle[b] for b in text_bytes)
         ids = super()._encode_chunk(text_bytes)
         return ids
 
     def decode(self, ids):
         text_bytes = b"".join(self.vocab[idx] for idx in ids)
         text_bytes = bytes(self.inverse_byte_shuffle[b] for b in text_bytes)
-        text = text_bytes.decode("utf-8", error="replace")
+        text = text_bytes.decode("utf-8", errors="replace")
         return text
     
     def train(self, text, vocab_size):
@@ -85,4 +85,7 @@ class GPT4Tokenizer(RegexTokenizer):
     
     def load(self, model_file):
         raise NotImplementedError("Pretrained mode, what are you thinking?")
-    
+
+ 
+# tk = GPT4Tokenizer()
+# print(tk.decode(tk.encode("hello world!!!? (안녕하세요!) lol123 😉,<|endoftext|>", allowed_special="none")))
